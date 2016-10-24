@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+
+# virsh setmaxmem squid 6G --config
+# virsh setmem squid 6G --config
+
+use Switch;
+use warnings;
+
+START:
+
+my @hosts = ( "yosemite", "bugs", "HOMER", "ansi", "bugzilla", "cob", "daffy", "elmer", "ipa1", "ipa2", "jenkins", "kickstart", "os", "postgres", "squid", "win7", "speedy", "mysql", "mongo", "kali");
+
+system("clear");
+
+print ("*******************************************\n");
+print ("**                                       **\n");
+print ("** Type L to list all hosts.             **\n");
+print ("** Type O to power on a host.            **\n");
+print ("** Type D to power down a host.          **\n");
+print ("** Type E to destroy a host.             **\n");
+print ("** Type P to pause all domains.		 **\n");
+print ("** Type R to resume all domains.	 **\n");
+print ("** Type T to resume a single domain.	 **\n");
+print ("** Type M to print the array.            **\n");
+print ("** Type N to power on all domains.       **\n");
+print ("** Type P to power off all domains.      **\n");
+print ("** Type S to search for string pop.      **\n");
+print ("** Type Q to quit.                       **\n");
+print ("**                                       **\n");
+print ("*******************************************\n\n");
+
+chomp($x=<STDIN>);
+
+switch ($x) {
+  case /^[lL]$/ {&GetList();}
+  case /^[oO]$/ {
+                        print ("What host do you want to power on - ");
+                        &GetList();
+                        chomp($host = <STDIN>);
+                        system("virsh start $host");
+                }
+  case /^[dD]$/ {
+                        print ("What host do you want to power off - ");
+                        &GetList();
+                        chomp($host = <STDIN>);
+                        system("virsh shutdown $host");
+                }
+  case /^[eE]$/ {
+                        print ("What host do you want to destroy - ");
+                        &GetList();
+                        chomp($host = <STDIN>);
+                        system("virsh destroy $host");
+			# system("virsh undefine $host"); 
+			# virsh vol-delete --pool vg0 virt1.example.com.img
+                }
+  case /^[pP]$/ {
+			foreach my $n (@hosts) {
+				system("virsh suspend $n");
+			}
+		}	
+  case /^[rR]$/ {
+			foreach my $n (@hosts) {
+				system("virsh resume $n");
+			}
+		}	
+  case /^[Mm]$/ {
+			foreach my $n (@hosts) {
+				print ("\n$n;");
+			}
+		}
+  case /^[Nn]$/ {
+			foreach my $n (@hosts) {
+				system("virsh start $n;");
+			}
+		}
+  case /^[Pp]$/ {
+			foreach my $n (@hosts) {
+				system("virsh shutdown $n;");
+			}
+		}
+  case /^[Ss]$/ {
+			open(F,"services");
+			@list=<F>;close F;
+			$this="smtp";
+			@f=grep /$this/,@list;
+			print "@f";
+		}
+  case /^[qQ]$/ {
+                        print "\nGood bye!\n";
+                        exit 0;
+                }
+  case /^[tT]$/ {
+                        print ("What host do you want to resume - ");
+                        &GetList();
+                        chomp($host = <STDIN>);
+                        system("virsh resume $host");
+                }
+
+  else {print("Invalid entry.  Good bye.")}
+};
+
+print("\n\nPress any key to continue...");
+chomp($ANSWER = <STDIN>);
+
+sub GetList
+ {
+  system("virsh list --all");
+ };
+
+goto START
