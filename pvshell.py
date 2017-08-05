@@ -6,6 +6,7 @@ allhosts=['yosemite','bugs','HOMER','ansi','bugzilla','cob','daffy','elmer','ipa
 
 os.system("clear");
 
+# comment 
 #def listhosts( listall ):
 
 print "*******************************************"
