@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+# Perl based virsh menu admin
 # virsh setmaxmem squid 6G --config
 # virsh setmem squid 6G --config
 # blabla
